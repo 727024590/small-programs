@@ -51,7 +51,6 @@ def cws_and_sdgp(x_appid, api_key, text):
     req_sdgp = urllib.request.Request(url + 'sdgp', body, x_header)
     cws = urllib.request.urlopen(req_cws).read()
     sdgp = urllib.request.urlopen(req_sdgp).read()
-    time.sleep(0.06)
 
     print(cws)
     print(sdgp)
@@ -105,15 +104,15 @@ if __name__ == '__main__':
     for eachid in apikey_list:
         x_appid = eachid[0]
         api_key = eachid[1]
-        # 每次处理400条数据
-        end = start + 5
-        for i in range(start, end):
+        # 每次处理500条数据
+        for i in range(start, start + 500):
             text = textlist[i]
             row = cws_and_sdgp(x_appid, api_key, text)
+            time.sleep(1)
             final += tuple_extract(row)
 
         # 创建一个Excel表
-        book = xlsxwriter.Workbook('./data/doctor_' + str(start) +'.xlsx')
+        book = xlsxwriter.Workbook('./data/doctor_' + str(start + 500) +'.xlsx')
         # 添加Sheet1
         sheet1 = book.add_worksheet('Sheet1')
         # 录入表头
@@ -129,4 +128,4 @@ if __name__ == '__main__':
             i += 1
 
         book.close()
-        start += 5
+        start += 500 
