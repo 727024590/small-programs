@@ -108,7 +108,7 @@ if __name__ == '__main__':
         for i in range(start, start + 500):
             text = textlist[i]
             row = cws_and_sdgp(x_appid, api_key, text)
-            time.sleep(1)
+            time.sleep(0.06)
             final += tuple_extract(row)
 
         # 创建一个Excel表
@@ -129,3 +129,4 @@ if __name__ == '__main__':
 
         book.close()
         start += 500 
+        final = []
