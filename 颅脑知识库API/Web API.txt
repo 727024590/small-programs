@@ -1,0 +1,30 @@
+1. 接口地址
+获取所有数据
+GET http://127.0.0.1:5200/data/all
+Content-Type:application
+
+检索请求
+POST http://127.0.0.1:5200/data/retrieval
+Content-Type:application
+
+2.POST请求参数
+所有请求均提交json格式的字符串，参数如下
+
+参数       说明
+"attr"   检索字段，可选"tumorNameEn", "NameInCN", "MeshCode", "ICD_10Code", "ICD_OCode"
+"value"  string格式
+
+例如：
+curl -X POST -H 'content-type: application/json' -i 'http://127.0.0.1:5200/data/retrieval' --data '{"attr":"NameInCN", "value":"不典型性脉络丛乳头状瘤"}'
+
+3.返回值
+{
+    "code": "",
+    "desc": "",
+    "data": []
+}
+
+各字段说明如下：
+code    string      "0": "success", "1": "no match", "2": "AttrError"
+desc    string      描述
+data    list对象     检索结果，可能包含多条记录，每条记录为dict
