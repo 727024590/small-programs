@@ -5,9 +5,9 @@
 
 模拟计算机间的进程通信
 
-## 2. sdgp.py、excel_merge.py
+## 2. sdgp.py、excel_merge.py、sdgp_statistic.py
 
-调用科大讯飞API进行语义依存分析；对结果进行合并并计数
+调用科大讯飞API进行语义依存分析；对结果进行合并并计数；对共现词对的关系进行统计
 
 ## 3.颅脑知识库API
 
