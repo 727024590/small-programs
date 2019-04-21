@@ -8,13 +8,14 @@ author: zhuzi  date: 2019/04/20    version: 1.0
 """
 
 import itchat
+import time
 
 
 # 对群消息进行自动回复
 @itchat.msg_register('Text', isGroupChat = True)
 def group_reply(msg):
 
-    print('%s：%s' % (msg.actualNickName, msg.text))
+    print(time.strftime("%m-%d %H:%M:%S", time.localtime()), '%s：%s' % (msg.actualNickName, msg.text))
     # 是否有人@自己
     if msg.isAt:
         return u'[自动回复]\n　　您好，我是机器人Diana，主人周末不在线，您的消息已收到，我会及时转达。'
@@ -25,7 +26,7 @@ def content_reply(msg):
 
     # 所有文本消息都给文件传输助手转发一份
     if msg['Type'] == 'Text':
-        print('%s：“%s”' % (msg['User']['RemarkName'], msg['Content']))
+        print(time.strftime("%m-%d %H:%M:%S", time.localtime()), '%s：“%s”' % (msg['User']['RemarkName'], msg['Content']))
         itchat.send('%s：\n“%s”' % (msg['User']['RemarkName'], msg['Content']), toUserName = 'filehelper')
     return u'[自动回复]\n　　您好，我是机器人Diana~，主人周末不在线哦，小的会如实转达您的留言~'
 
