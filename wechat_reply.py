@@ -15,9 +15,11 @@ import time
 @itchat.msg_register('Text', isGroupChat = True)
 def group_reply(msg):
 
-    print(time.strftime("%m-%d %H:%M:%S", time.localtime()), '%s：%s' % (msg.actualNickName, msg.text))
+    timestr = time.strftime("%m-%d %H:%M:%S", time.localtime())
+    print('%s %s：%s' % (timestr, msg.actualNickName, msg.text))
     # 是否有人@自己
     if msg.isAt:
+        itchat.send('%s %s：\n“%s”' % (timestr, msg.actualNickName, msg.text), toUserName = 'filehelper')
         return u'[自动回复]\n　　您好，我是机器人Diana，主人周末不在线，您的消息已收到，我会及时转达。'
 
 # 对文本、图片、语音、视频、分享、附件内容进行自动回复
@@ -26,8 +28,9 @@ def content_reply(msg):
 
     # 所有文本消息都给文件传输助手转发一份
     if msg['Type'] == 'Text':
-        print(time.strftime("%m-%d %H:%M:%S", time.localtime()), '%s：“%s”' % (msg['User']['RemarkName'], msg['Content']))
-        itchat.send('%s：\n“%s”' % (msg['User']['RemarkName'], msg['Content']), toUserName = 'filehelper')
+        timestr = time.strftime("%m-%d %H:%M:%S", time.localtime())
+        print('%s %s：“%s”' % (timestr, msg['User']['RemarkName'], msg['Content']))
+        itchat.send('%s %s：\n“%s”' % (timestr, msg['User']['RemarkName'], msg['Content']), toUserName = 'filehelper')
     return u'[自动回复]\n　　您好，我是机器人Diana~，主人周末不在线哦，小的会如实转达您的留言~'
 
 
