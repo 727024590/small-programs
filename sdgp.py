@@ -49,11 +49,19 @@ def cws_and_sdgp(x_appid, api_key, text):
                 'X-CheckSum': x_checksum}
     req_cws = urllib.request.Request(url + 'cws', body, x_header)
     req_sdgp = urllib.request.Request(url + 'sdgp', body, x_header)
-    cws = urllib.request.urlopen(req_cws).read()
-    sdgp = urllib.request.urlopen(req_sdgp).read()
+    try:
+        cws = urllib.request.urlopen(req_cws).read()
+        print(cws)
+    except urllib.error.HTTPError as e:
+        print('urllib.error.HTTPError: ', e)
+        return None
+    try:
+        sdgp = urllib.request.urlopen(req_sdgp).read()
+        print(sdgp)
+    except urllib.error.HTTPError as e:
+        print('urllib.error.HTTPError: ', e)
+        return None
 
-    print(cws)
-    print(sdgp)
     return [cws, sdgp]
 
 # 解析json数据并抽取三元组存放到list中
@@ -108,6 +116,9 @@ if __name__ == '__main__':
         for i in range(start, start + 500):
             text = textlist[i]
             row = cws_and_sdgp(x_appid, api_key, text)
+            if row == None:
+                time.sleep(60)
+                continue
             time.sleep(0.06)
             final += tuple_extract(row)
 
