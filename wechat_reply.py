@@ -9,6 +9,9 @@ author: zhuzi  date: 2019/04/20    version: 1.0
 
 import itchat
 import time
+import random
+import requests
+import json
 
 
 # 对群消息进行自动回复
@@ -19,8 +22,16 @@ def group_reply(msg):
     print('%s %s：%s' % (timestr, msg.actualNickName, msg.text))
     # 是否有人@自己
     if msg.isAt:
+        time.sleep(random.random())
         itchat.send('%s %s：\n“%s”' % (timestr, msg.actualNickName, msg.text), toUserName = 'filehelper')
-        return u'[自动回复]\n　　您好，我是机器人Diana，主人五一不在线，您的消息已收到，我会及时转达。'
+        time.sleep(random.random())
+        return (u'[自动回复] %s\n　　您好，我是助手Diana，主人五一不在线，您的消息已收到，我会及时转达。\n【消息以"@Diana $"开头，我可以尝试进行回复】' % timestr)
+    # 以'@Diana $'开头的文本调用图灵机器人进行回复
+    if msg.text.startswith('@Diana $'):
+        robot_ans = tuling_reply(msg.text.lstrip('@Diana $'))
+        time.sleep(random.random())
+        return robot_ans
+
 
 # 对文本、图片、语音、视频、分享、附件内容进行自动回复
 @itchat.msg_register(['Text', 'Picture', 'Recording', 'Video', 'Sharing', 'Attachment'])
@@ -28,16 +39,44 @@ def content_reply(msg):
 
     # 所有文本消息都给文件传输助手转发一份
     if msg['Type'] == 'Text':
+        # 以'$'开头的文本调用图灵机器人进行回复
+        if msg.text.startswith('$'):
+            robot_ans = tuling_reply(msg.text.lstrip('$'))
+            time.sleep(random.random())
+            return robot_ans
         timestr = time.strftime("%m-%d %H:%M:%S", time.localtime())
         # 将不是自己发送的消息转发给文件助手
         if not msg.fromUserName == myUserName:
             print('%s %s：“%s”' % (timestr, msg.user.RemarkName, msg.text))
             #print('%s %s：“%s”' % (timestr, msg['User']['RemarkName'], msg['Content']))
+            time.sleep(random.random())
             itchat.send('%s %s：\n“%s”' % (timestr, msg.user.RemarkName, msg.text), toUserName = 'filehelper')
         else:
             print('%s %s：“%s”' % (timestr, '自己', msg.text))
             
-    return u'[自动回复]\n　　您好，我是机器人Diana~，主人五一不在线哦，小的会如实转达您的留言~'
+    time.sleep(random.random())
+    return (u'[自动回复] %s\n　　您好，我是助手Diana~，主人五一不在线哦，小的会如实转达您的留言~\n【试试以"$"开头进行回复，我会尽量尝试满足您的需求】' % timestr)
+
+
+def tuling_reply(text):
+
+    apiurl = 'http://openapi.tuling123.com/openapi/api/v2'
+    # 读取图灵api
+    with open('./data/tuling_api.txt', 'r') as f:
+        apikey = f.readline().strip()
+    data = {
+        'perception': {
+            'inputText': {
+                'text': text
+            }
+        },
+        'userInfo': {
+            'apiKey': apikey,
+            'userId': 'Diana'
+        }
+    }
+    r = requests.post(apiurl, data = json.dumps(data)).json()
+    return r['results'][0]['values']['text']
 
 
 if __name__ == '__main__':
