@@ -6,6 +6,7 @@
 
 author: zhuzi  date: 2019/04/20    version: 1.0
 author: zhuzi  date: 2019/05/03    version: 1.1     function: 增加了图灵机器人
+author: zhuzi  date: 2019/05/18    version: 1.2     function: 增加自动回复的白名单机制
 """
 
 import itchat
@@ -20,12 +21,16 @@ def group_reply(msg):
 
     timestr = time.strftime("%m-%d %H:%M:%S", time.localtime())
     print('%s %s：%s' % (timestr, msg.actualNickName, msg.text))
+
+    if msg['FromUserName'] in room_white_list:
+        return None
+
     # 是否有人@自己
     if msg.isAt:
         time.sleep(random.uniform(0, 3))
         itchat.send('%s %s：\n“%s”' % (timestr, msg.actualNickName, msg.text), toUserName = 'filehelper')
         time.sleep(random.uniform(0, 3))
-        return (u'[自动回复] %s\n　　您好，我是助手Diana，主人周末不上线，您的消息已收到，我会及时转达。\n【消息以"$"开头，我可以尝试进行回复】' % timestr)
+        return (u'[自动回复] %s\n　　您好，我是助手Diana，主人周末不在线，您的消息已收到，我会及时转达。\n【消息以"$"开头，我可以尝试进行回复】' % timestr)
     # 以'$'开头的文本调用图灵机器人进行回复
     if msg.text.startswith('$') or msg.text.startswith('＄'):
         robot_ans = tuling_reply(msg.text.lstrip('$＄'))
@@ -37,6 +42,10 @@ def group_reply(msg):
 def content_reply(msg):
 
     timestr = time.strftime("%m-%d %H:%M:%S", time.localtime())
+    if msg['FromUserName'] in white_list:
+        print('%s %s：“%s”' % (timestr, msg.user.RemarkName, msg.text))
+        return None
+
     # 所有文本消息都给文件传输助手转发一份
     if msg['Type'] == 'Text':
         # 以'$'开头的文本调用图灵机器人进行回复
@@ -55,7 +64,7 @@ def content_reply(msg):
             print('%s %s：“%s”' % (timestr, '自己', msg.text))
             
     time.sleep(random.uniform(0, 3))
-    return (u'[自动回复] %s\n　　您好，我是助手Diana~，主人正忙，小的会如实转达您的留言~\n【试试以"$"开头进行回复，我会尽量尝试满足您的需求】' % timestr)
+    return (u'[自动回复] %s\n　　您好，我是助手Diana~，主人周末不在线(消息周一统一回复)，小的会如实转达您的留言~\n【试试以"$"开头进行回复，我会尽量尝试回答的】' % timestr)
 
 
 def tuling_reply(text):
@@ -87,4 +96,14 @@ if __name__ == '__main__':
     # 登录，命令行显示二维码，设置块字符的宽度为2，退出程序后暂存登录状态
     itchat.auto_login(enableCmdQR = 2, hotReload = True)
     myUserName = itchat.get_friends()[0]['UserName']
+    # 加载白名单，名单中的好友不自动回复
+    with open('./data/white_list.txt', 'r') as f:
+        white_list = f.read().splitlines()
+
+    # 获取通讯录中群聊，不进行自动回复
+    room_list = itchat.get_chatrooms(update = True)
+    room_white_list = []
+    for room in room_list:
+        room_white_list.append(room['UserName'])
+
     itchat.run()
