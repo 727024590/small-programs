@@ -16,3 +16,7 @@
 ## 4. wechat_reply.py
 
 使用itchat调用网页版微信并使用图灵机器人API，实现消息的自动回复
+
+## 5. wechat_friends.py
+
+使用itchat分析微信好友
