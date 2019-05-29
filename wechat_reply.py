@@ -16,7 +16,7 @@ import requests
 import json
 
 # 对群消息进行自动回复
-@itchat.msg_register('Text', isGroupChat = True)
+@itchat.msg_register('Text', isGroupChat=True)
 def group_reply(msg):
 
     timestr = time.strftime("%m-%d %H:%M:%S", time.localtime())
@@ -28,9 +28,16 @@ def group_reply(msg):
     # 是否有人@自己
     if msg.isAt:
         time.sleep(random.uniform(0, 3))
-        itchat.send('%s %s：\n“%s”' % (timestr, msg.actualNickName, msg.text), toUserName = 'filehelper')
+        itchat.send(
+            '%s %s：\n“%s”' %
+            (timestr,
+             msg.actualNickName,
+             msg.text),
+            toUserName='filehelper')
         time.sleep(random.uniform(0, 3))
-        return (u'[自动回复] %s\n　　您好，我是助手Diana，主人周末不在线，您的消息已收到，我会及时转达。\n【消息以"$"开头，我可以尝试进行回复】' % timestr)
+        return (
+            u'[自动回复] %s\n　　您好，我是助手Diana，主人周末不在线，您的消息已收到，我会及时转达。\n【消息以"$"开头我可以陪您聊天哦】' %
+            timestr)
     # 以'$'开头的文本调用图灵机器人进行回复
     if msg.text.startswith('$') or msg.text.startswith('＄'):
         robot_ans = tuling_reply(msg.text.lstrip('$＄'))
@@ -38,11 +45,13 @@ def group_reply(msg):
         return robot_ans
 
 # 对文本、图片、语音、视频、分享、附件内容进行自动回复
-@itchat.msg_register(['Text', 'Picture', 'Recording', 'Video', 'Sharing', 'Attachment'])
+@itchat.msg_register(['Text', 'Picture', 'Recording',
+                      'Video', 'Sharing', 'Attachment'])
 def content_reply(msg):
 
     timestr = time.strftime("%m-%d %H:%M:%S", time.localtime())
-    if msg['FromUserName'] in white_list:
+    if (msg['FromUserName'] in white_list) or (
+            msg.user.RemarkName in white_list):
         print('%s %s：“%s”' % (timestr, msg.user.RemarkName, msg.text))
         return None
 
@@ -59,12 +68,19 @@ def content_reply(msg):
         if not msg.fromUserName == myUserName:
             print('%s %s：“%s”' % (timestr, msg.user.RemarkName, msg.text))
             time.sleep(random.uniform(0, 3))
-            itchat.send('%s %s：\n“%s”' % (timestr, msg.user.RemarkName, msg.text), toUserName = 'filehelper')
+            itchat.send(
+                '%s %s：\n“%s”' %
+                (timestr,
+                 msg.user.RemarkName,
+                 msg.text),
+                toUserName='filehelper')
         else:
             print('%s %s：“%s”' % (timestr, '自己', msg.text))
-            
+
     time.sleep(random.uniform(0, 3))
-    return (u'[自动回复] %s\n　　您好，我是助手Diana~，主人周末不在线(消息周一统一回复)，小的会如实转达您的留言~\n【试试以"$"开头进行回复，我会尽量尝试回答的】' % timestr)
+    return (
+        u'[自动回复] %s\n　　您好，我是助手Diana~，主人周末不在线，消息周一统一回复(^_^)\n【试试以"$"开头进行回复可以和我聊天哦[奸笑]】' %
+        timestr)
 
 
 def tuling_reply(text):
@@ -84,24 +100,25 @@ def tuling_reply(text):
             'userId': 'Diana'
         }
     }
-    r = requests.post(apiurl, data = json.dumps(data)).json()
+    r = requests.post(apiurl, data=json.dumps(data)).json()
     try:
         return r['results'][0]['values']['text']
     except KeyError:
-        return r['results'][1]['values']['text'] + '\n' + r['results'][0]['values']['url']
+        return r['results'][1]['values']['text'] + \
+            '\n' + r['results'][0]['values']['url']
 
 
 if __name__ == '__main__':
 
     # 登录，命令行显示二维码，设置块字符的宽度为2，退出程序后暂存登录状态
-    itchat.auto_login(enableCmdQR = 2, hotReload = True)
+    itchat.auto_login(enableCmdQR=2, hotReload=True)
     myUserName = itchat.get_friends()[0]['UserName']
     # 加载白名单，名单中的好友不自动回复
     with open('./data/white_list.txt', 'r') as f:
         white_list = f.read().splitlines()
 
     # 获取通讯录中群聊，不进行自动回复
-    room_list = itchat.get_chatrooms(update = True)
+    room_list = itchat.get_chatrooms(update=True)
     room_white_list = []
     for room in room_list:
         room_white_list.append(room['UserName'])
