@@ -4,9 +4,9 @@
 """
 基于itchat的微信自动回复设置，非工作时间处理公务是真的烦，所以写个程序来背锅。
 
-author: zhuzi  date: 2019/04/20    version: 1.0
-author: zhuzi  date: 2019/05/03    version: 1.1     function: 增加了图灵机器人
-author: zhuzi  date: 2019/05/18    version: 1.2     function: 增加自动回复的白名单机制
+author: Six  date: 2019/04/20    version: 1.0
+author: Six  date: 2019/05/03    version: 1.1     function: 增加了图灵机器人
+author: Six  date: 2019/05/18    version: 1.2     function: 增加自动回复的白名单机制
 """
 
 import itchat
@@ -36,7 +36,7 @@ def group_reply(msg):
             toUserName='filehelper')
         time.sleep(random.uniform(0, 3))
         return (
-            u'[自动回复] %s\n　　您好，我是助手Diana，主人周末不在线，您的消息已收到，我会及时转达。\n【消息以"$"开头我可以陪您聊天哦】' %
+            u'[自动回复] %s\n　　您好，我是助手Diana，主人端午放假不在线，您的消息已收到，我会及时转达。\n【消息以"$"开头我可以陪您聊天哦】' %
             timestr)
     # 以'$'开头的文本调用图灵机器人进行回复
     if msg.text.startswith('$') or msg.text.startswith('＄'):
@@ -79,7 +79,7 @@ def content_reply(msg):
 
     time.sleep(random.uniform(0, 3))
     return (
-        u'[自动回复] %s\n　　您好，我是助手Diana~，主人周末不在线，消息周一统一回复(^_^)\n【试试以"$"开头进行回复可以和我聊天哦[奸笑]】' %
+        u'[自动回复] %s\n　　您好，我是助手Diana~，主人端午放假不在线，消息周一统一回复(^_^)\n【试试以"$"开头进行回复可以和我聊天哦[奸笑]】' %
         timestr)
 
 
