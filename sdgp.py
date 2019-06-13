@@ -108,7 +108,6 @@ if __name__ == '__main__':
     final = []
     # 数据的起始处理位置
     start = 0
-    # MD，给SB师姐写程序，这也就罢了，竟然还打算让我手动干这么多活，幸亏大哥机智，小改一下程序批量处理
     for eachid in apikey_list:
         x_appid = eachid[0]
         api_key = eachid[1]
