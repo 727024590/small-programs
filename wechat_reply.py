@@ -4,9 +4,9 @@
 """
 基于itchat的微信自动回复设置，非工作时间处理公务是真的烦，所以写个程序来背锅。
 
-author: Six  date: 2019/04/20    version: 1.0
-author: Six  date: 2019/05/03    version: 1.1     function: 增加了图灵机器人
-author: Six  date: 2019/05/18    version: 1.2     function: 增加自动回复的白名单机制
+Author: Six  Date: 2019/04/20    Version: 1.0
+Author: Six  Date: 2019/05/03    Version: 1.1     Function: 增加了图灵机器人
+Author: Six  Date: 2019/05/18    Version: 1.2     Function: 增加自动回复的白名单机制
 """
 
 import itchat
@@ -22,7 +22,10 @@ def group_reply(msg):
     timestr = time.strftime("%m-%d %H:%M:%S", time.localtime())
     print('%s %s：%s' % (timestr, msg.actualNickName, msg.text))
 
-    if msg['FromUserName'] in room_white_list:
+    # 白名单中的群聊不进行自动回复
+    #if msg['FromUserName'] in room_white_list:
+    #    return None
+    if msg.actualNickName in white_list_in_room:
         return None
 
     # 是否有人@自己
@@ -34,38 +37,29 @@ def group_reply(msg):
              msg.actualNickName,
              msg.text),
             toUserName='filehelper')
-        time.sleep(random.uniform(0, 3))
-        return (
-            u'[自动回复] %s\n　　您好，我是助手Diana，主人端午放假不在线，您的消息已收到，我会及时转达。\n【消息以"$"开头我可以陪您聊天哦】' %
-            timestr)
-    # 以'$'开头的文本调用图灵机器人进行回复
-    if msg.text.startswith('$') or msg.text.startswith('＄'):
-        robot_ans = tuling_reply(msg.text.lstrip('$＄'))
+
+        robot_ans = tuling_reply(msg.text)
+        print('%s %s：%s' % (timestr, 'Diana', robot_ans))
         time.sleep(random.uniform(0, 3))
         return robot_ans
 
-# 对文本、图片、语音、视频、分享、附件内容进行自动回复
-@itchat.msg_register(['Text', 'Picture', 'Recording',
-                      'Video', 'Sharing', 'Attachment'])
+# 对文本、语音内容进行自动回复
+@itchat.msg_register(['Text', 'Recording'])
 def content_reply(msg):
 
     timestr = time.strftime("%m-%d %H:%M:%S", time.localtime())
-    if (msg['FromUserName'] in white_list) or (
-            msg.user.RemarkName in white_list):
+
+    # 白名单内的人不进行自动回复
+    if msg.user.RemarkName in white_list:
         print('%s %s：“%s”' % (timestr, msg.user.RemarkName, msg.text))
         return None
 
-    # 所有文本消息都给文件传输助手转发一份
+    # 文本消息转发给文件助手并调用图灵机器人进行回复
     if msg['Type'] == 'Text':
-        # 以'$'开头的文本调用图灵机器人进行回复
-        if msg.text.startswith('$') or msg.text.startswith('＄'):
-            print('%s %s：“%s”' % (timestr, msg.user.RemarkName, msg.text))
-            #print('%s %s：“%s”' % (timestr, msg['User']['RemarkName'], msg['Content']))
-            robot_ans = tuling_reply(msg.text.lstrip('$＄'))
-            time.sleep(random.uniform(0, 3))
-            return robot_ans
-        # 将不是自己发送的消息转发给文件助手
-        if not msg.fromUserName == myUserName:
+        if msg.fromUserName == myUserName:
+            print('%s %s：“%s”' % (timestr, '自己', msg.text))
+            return None
+        else:
             print('%s %s：“%s”' % (timestr, msg.user.RemarkName, msg.text))
             time.sleep(random.uniform(0, 3))
             itchat.send(
@@ -74,13 +68,24 @@ def content_reply(msg):
                  msg.user.RemarkName,
                  msg.text),
                 toUserName='filehelper')
+
+        prefix = '【周末休息不在线，机器人回复】\n'
+        now = time.time()
+        # 如果同一人的消息冷却时间短于10分钟，则不加机器人回复的前缀
+        if msg.user.RemarkName in usertime_dict:
+            if now - usertime_dict[msg.user.RemarkName] < 600:
+                prefix = ''
+            usertime_dict[msg.user.RemarkName] = now
         else:
-            print('%s %s：“%s”' % (timestr, '自己', msg.text))
+            usertime_dict[msg.user.RemarkName] = now
+
+        robot_ans = ''.join([prefix, tuling_reply(msg.text)])
+        print('%s %s：“%s”' % (timestr, 'Diana', robot_ans))
+        return robot_ans
 
     time.sleep(random.uniform(0, 3))
     return (
-        u'[自动回复] %s\n　　您好，我是助手Diana~，主人端午放假不在线，消息周一统一回复(^_^)\n【试试以"$"开头进行回复可以和我聊天哦[奸笑]】' %
-        timestr)
+        u'[自动回复] %s\n　　您好，我是助手Diana~，主人周末不在线，消息周一统一回复哦(^_^)' % timestr)
 
 
 def tuling_reply(text):
@@ -116,11 +121,16 @@ if __name__ == '__main__':
     # 加载白名单，名单中的好友不自动回复
     with open('./data/white_list.txt', 'r') as f:
         white_list = f.read().splitlines()
+    # 存放消息发送者发送上一条消息的时间
+    usertime_dict = dict()
 
     # 获取通讯录中群聊，不进行自动回复
-    room_list = itchat.get_chatrooms(update=True)
-    room_white_list = []
-    for room in room_list:
-        room_white_list.append(room['UserName'])
+    #room_list = itchat.get_chatrooms(update=True)
+    #room_white_list = []
+    #for room in room_list:
+    #    room_white_list.append(room['UserName'])
+    # 名单中的人在群里发出的@消息不进行自动回复
+    with open('./data/white_list_in_room.txt', 'r') as f:
+        white_list_in_room = f.read().splitlines()
 
     itchat.run()
