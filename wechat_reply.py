@@ -7,6 +7,7 @@
 Author: Six  Date: 2019/04/20    Version: 1.0
 Author: Six  Date: 2019/05/03    Version: 1.1     Function: 增加了图灵机器人
 Author: Six  Date: 2019/05/18    Version: 1.2     Function: 增加自动回复的白名单机制
+Author: Six  Date: 2019/06/24    Version: 1.3     Function: 增加了通过文件助手控制白名单的功能
 """
 
 import itchat
@@ -14,6 +15,7 @@ import time
 import random
 import requests
 import json
+import re
 
 # 对群消息进行自动回复
 @itchat.msg_register('Text', isGroupChat=True)
@@ -48,6 +50,19 @@ def group_reply(msg):
 def content_reply(msg):
 
     timestr = time.strftime("%m-%d %H:%M:%S", time.localtime())
+
+    # 接收手机端对文件助手发送的消息进行个性化处理
+    if msg.toUserName == 'filehelper' and msg['Type'] == 'Text':
+        # 使用正则判断name=open或name=close的形式对白名单进行临时增删
+        namectl = re.match(r'^(\w+)=(open|close)$', msg.text)
+        if namectl:
+            if namectl.group(2) == 'open':
+                white_list.discard(namectl.group(1))
+                white_list_in_room.discard(namectl.group(1))
+            else:
+                white_list.add(namectl.group(1))
+                white_list_in_room.add(namectl.group(1))
+        return None
 
     # 白名单内的人不进行自动回复
     if msg.user.RemarkName in white_list:
@@ -120,7 +135,7 @@ if __name__ == '__main__':
     myUserName = itchat.get_friends()[0]['UserName']
     # 加载白名单，名单中的好友不自动回复
     with open('./data/white_list.txt', 'r') as f:
-        white_list = f.read().splitlines()
+        white_list = set(f.read().splitlines())
     # 存放消息发送者发送上一条消息的时间
     usertime_dict = dict()
 
@@ -131,6 +146,6 @@ if __name__ == '__main__':
     #    room_white_list.append(room['UserName'])
     # 名单中的人在群里发出的@消息不进行自动回复
     with open('./data/white_list_in_room.txt', 'r') as f:
-        white_list_in_room = f.read().splitlines()
+        white_list_in_room = set(f.read().splitlines())
 
     itchat.run()
