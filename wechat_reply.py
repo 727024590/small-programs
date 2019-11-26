@@ -32,7 +32,7 @@ def group_reply(msg):
 
     # 是否有人@自己
     if msg.isAt:
-        time.sleep(random.uniform(0, 3))
+        time.sleep(random.uniform(0, 2))
         itchat.send(
             '%s %s：\n“%s”' %
             (timestr,
@@ -42,7 +42,7 @@ def group_reply(msg):
 
         robot_ans = tuling_reply(msg.text)
         print('%s %s：%s' % (timestr, 'Diana', robot_ans))
-        time.sleep(random.uniform(0, 3))
+        time.sleep(random.uniform(0, 2))
         return robot_ans
 
 # 对文本、语音内容进行自动回复
@@ -76,7 +76,7 @@ def content_reply(msg):
             return None
         else:
             print('%s %s：“%s”' % (timestr, msg.user.RemarkName, msg.text))
-            time.sleep(random.uniform(0, 3))
+            time.sleep(random.uniform(0, 2))
             itchat.send(
                 '%s %s：\n“%s”' %
                 (timestr,
@@ -96,9 +96,10 @@ def content_reply(msg):
 
         robot_ans = ''.join([prefix, tuling_reply(msg.text)])
         print('%s %s：“%s”' % (timestr, 'Diana', robot_ans))
+        time.sleep(random.uniform(0, 2))
         return robot_ans
 
-    time.sleep(random.uniform(0, 3))
+    time.sleep(random.uniform(0, 2))
     return (
         u'[自动回复] %s\n　　您好，我是助手Diana~，主人周末不在线，消息周一统一回复哦(^_^)' % timestr)
 
