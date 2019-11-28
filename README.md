@@ -1,22 +1,32 @@
 # small-programs
+
 记录平时在学习或工作中随手写的代码
 
-## 1. IPC_master.py、IPC_worker.py
+* **wikipedia_first_link_spider.py**
 
-模拟计算机间的进程通信
+    从维基百科某词条开始，一直跳转并存储第一个链接，直到抵达“哲学”词条或陷入循环或达到最大次数。
 
-## 2. sdgp.py、excel_merge.py、sdgp_statistic.py
+* **IPC_master.py、IPC_worker.py**
 
-调用科大讯飞API进行语义依存分析；对结果进行合并并计数；对共现词对的关系进行统计
+    模拟计算机间的进程通信。
 
-## 3. 颅脑知识库API
+* **wechat_friends.py**
 
-以接口形式调用颅脑知识库，接口参数详见Web API.txt
+    使用itchat分析微信好友。
 
-## 4. wechat_reply.py
+* **wechat_reply.py**
 
-使用itchat调用网页版微信并使用图灵机器人API，实现消息的自动回复
+    使用itchat调用网页版微信并使用图灵机器人API，实现消息的自动回复。
 
-## 5. wechat_friends.py
+* **sdgp.py、excel_merge.py、sdgp_statistic.py**
 
-使用itchat分析微信好友
+    调用科大讯飞API进行语义依存分析；对结果进行合并并计数；对共现词对的关系进行统计。
+
+* **颅脑知识库API**
+
+    以接口形式调用颅脑知识库，接口参数详见Web API.txt。
+
+
+
+
+
