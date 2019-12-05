@@ -2,6 +2,10 @@
 
 记录平时在学习或工作中随手写的代码
 
+* **word_segment_tool.ipynb**
+
+使用基于词典的Unigram方法并采取维特比算法搭建的一个简单的中文分词工具。
+
 * **classic_problems.ipynb**
 
     一些常见问题的解题集合，累加更新。
