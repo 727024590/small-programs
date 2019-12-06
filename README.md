@@ -4,7 +4,7 @@
 
 * **word_segment_tool.ipynb**
 
-使用基于词典的Unigram方法并采取维特比算法搭建的一个简单的中文分词工具。
+    使用基于词典的Unigram方法并采取维特比算法搭建的一个简单的中文分词工具。
 
 * **classic_problems.ipynb**
 
